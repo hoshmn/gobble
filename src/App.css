@@ -1,38 +1,94 @@
 .App {
   text-align: center;
+  font-family: Arial, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 10px;
+  width: fit-content;
+  margin: 20px auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.cell {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 20px;
+  font-size: 60px;
+  /* font-weight: bold; */
+    text-transform: capitalize;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  height: 60px;
+  width: 60px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  user-select: none;
+  }
+  
+  .cell.selected {
+    background-color: #b3d9ff;
 }
 
-.App-link {
-  color: #61dafb;
+.timer h3 {
+  display: inline-block;
+  padding-right: 8px;
+}
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: monospace;
+  cursor: pointer;
+}
+/* Modal styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+}
+
+.textarea-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 10px;
+}
+
+textarea {
+  width: 100px;
+  height: 40px;
+  resize: none;
+  overflow: auto;
+}
+
+button {
+  margin: 5px;
   }
-  to {
-    transform: rotate(360deg);
-  }
+  
+  input {
+    width: 60px;
+    text-align: center;
+}
+input.invalid {
+  border: 1px solid red;
 }
