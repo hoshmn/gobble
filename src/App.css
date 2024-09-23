@@ -1,8 +1,12 @@
 .App {
   text-align: center;
   font-family: Arial, sans-serif;
+  max-width: 600px;
 }
 
+.board-container {
+  position: relative;
+}
 .board {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -13,25 +17,40 @@
 
 .cell {
   background-color: #f0f0f0;
+  box-sizing: border-box;
   border: 1px solid #ccc;
   padding: 20px;
   font-size: 60px;
-  /* font-weight: bold; */
     text-transform: capitalize;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60px;
-  width: 60px;
+  height: 100px;
+    width: 100px;
   cursor: pointer;
   transition: background-color 0.2s;
   user-select: none;
   }
   
   .cell.selected {
-    background-color: #b3d9ff;
+    background-color: #b3d9ff !important;
 }
 
+.board.solution-hovered .cell:not(.hovered) {
+  opacity: 0.1;
+}
+
+.board.solution-hovered .cell.hovered {
+  border: 2px solid #ffd618;
+}
+
+.board.solution-hovered .cell.hovered.first {
+  border-width: 6px;
+  }
+  
+  .board.solution-hovered .cell.hovered.last {
+    border-color: black;
+}
 .timer h3 {
   display: inline-block;
   padding-right: 8px;
@@ -43,6 +62,49 @@ button {
   font-family: monospace;
   cursor: pointer;
 }
+canvas {
+  z-index: -1;
+}
+
+@media screen and (max-width: 900px) {
+  .App {
+    margin: auto;
+  }
+}
+@media screen and (min-width: 900px) {
+  
+  .solutions {
+    position: absolute;
+    text-align: start;
+    left: 600px;
+      top: 80px;
+  }
+}
+
+.solutions .toggles {
+  font-size: 16px;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+.solutions input {
+  margin-left: 16px;
+  margin-right: 4px;
+}
+.word-list span {
+  font-family: monospace;
+  padding: 8px;
+  margin: 8px 8px 0 0;
+  text-transform: uppercase;
+  display: inline-block;
+  background: #f0f0f080;
+  border: 1px solid #ffd618;
+}
+
+.word-list span:hover {
+  background: #f0f0f0;
+}
+
 /* Modal styling */
 .modal {
   position: fixed;
@@ -83,9 +145,15 @@ textarea {
 
 button {
   margin: 5px;
+  background: #efeffa;
+    border-width: 1px
   }
   
-  input {
+  button:hover {
+    background: #ddddf5;
+}
+  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                input[type="text"] {
     width: 60px;
     text-align: center;
 }
