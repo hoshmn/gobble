@@ -7,7 +7,7 @@ const defaultGameSeconds = 244; // 4 minutes and 4 seconds
 const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
 
-function getUniqueWords(words) {
+function aggregateFoundWords(words) {
   const uniqueWords = [];
 
   words.forEach((word) => {
@@ -43,13 +43,11 @@ function App() {
   const [hideLetters, setHideLetters] = useState(false);
   const [time, setTime] = useState(defaultGameSeconds);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [gameLength, setGameLength] = useState(formatTime(defaultGameSeconds)); // Actual game length applied to the timer
-  // Input field state for game length
+  const [gameLength, setGameLength] = useState(formatTime(defaultGameSeconds));
   const [gameLengthInput, setGameLengthInput] = useState(
     formatTime(defaultGameSeconds)
   );
   const [wordsFound, setWordsFound] = useState([]);
-
   const [hoveredWordPath, setHoveredWordPath] = useState(null);
 
   const timerRef = useRef(null);
@@ -79,6 +77,9 @@ function App() {
   const shuffleDie = (index) => {
     const newBoard = [...board];
     const { die, active: oldActive } = newBoard[index];
+    // there's only one value, don't get stuck in a loop
+    if (new Set(die).size === 1) return;
+
     let newActive = oldActive;
     while (newActive === oldActive) {
       newActive = die[Math.floor(Math.random() * die.length)];
@@ -114,7 +115,7 @@ function App() {
 
   const handleInputChange = (index, value) => {
     const newDiceInput = [...diceInput];
-    newDiceInput[index] = value;
+    newDiceInput[index] = value.replace(/[^A-Za-z,]/g, ""); // Remove anything that's not a letter or ,
     setDiceInput(newDiceInput);
   };
 
@@ -222,7 +223,7 @@ function App() {
     }
 
     setWordsFound(
-      getUniqueWords(
+      aggregateFoundWords(
         foundWords.sort(
           (a, b) =>
             b.word.length - a.word.length || a.word.localeCompare(b.word)
@@ -355,10 +356,10 @@ function App() {
           <label>
             <input
               type="checkbox"
-              checked={showWords}
-              onChange={() => setShowWords(!showWords)}
+              checked={showHeatmap}
+              onChange={() => setShowHeatmap(!showHeatmap)}
             />
-            Words
+            Heatmap
           </label>
           <label>
             <input
@@ -371,10 +372,10 @@ function App() {
           <label>
             <input
               type="checkbox"
-              checked={showHeatmap}
-              onChange={() => setShowHeatmap(!showHeatmap)}
+              checked={showWords}
+              onChange={() => setShowWords(!showWords)}
             />
-            Heatmap
+            Words
           </label>
         </div>
         {showWords && (
