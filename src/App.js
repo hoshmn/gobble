@@ -8,13 +8,16 @@ const defaultGameSeconds = 244; // 4 minutes and 4 seconds
 const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
 
+const randomLetter = (letters) =>
+  letters[Math.floor(Math.random() * letters.length)];
+
 const timeStringFromSeconds = (timeInSeconds) => {
   const roundedTime = Math.round(timeInSeconds);
   const minutes = Math.floor(roundedTime / 60);
   const seconds = roundedTime % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
     2,
-    "0",
+    "0"
   )}`;
 };
 
@@ -36,10 +39,10 @@ function App() {
   const [time, setTime] = useState(defaultGameSeconds);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [gameLength, setGameLength] = useState(
-    timeStringFromSeconds(defaultGameSeconds),
+    timeStringFromSeconds(defaultGameSeconds)
   );
   const [gameLengthInput, setGameLengthInput] = useState(
-    timeStringFromSeconds(defaultGameSeconds),
+    timeStringFromSeconds(defaultGameSeconds)
   );
   const [wordsFound, setWordsFound] = useState([]);
   const [hoveredWordPath, setHoveredWordPath] = useState(null);
@@ -59,10 +62,15 @@ function App() {
   }, [time, isTimerRunning]);
 
   const generateBoard = () => {
-    const shuffledDice = [...dice].sort(() => 0.5 - Math.random());
-    const newBoard = shuffledDice.map((die) => ({
-      active: die[Math.floor(Math.random() * die.length)],
-      die: die,
+    // const shuffledDice = [...dice].sort(() => 0.5 - Math.random());
+    const shuffledDice = [...dice]
+      .map((letters, dieIndex) => ({ letters, dieIndex }))
+      .sort(() => 0.5 - Math.random());
+    console.log({ shuffledDice, shuffledDice });
+    const newBoard = shuffledDice.map(({ letters, dieIndex }) => ({
+      activeLetter: randomLetter(letters),
+      letters,
+      dieIndex,
     }));
     setBoard(newBoard);
     solveBoard(newBoard);
@@ -72,15 +80,15 @@ function App() {
   const shuffleDie = (index) => {
     if (isTimerRunning) return;
     const newBoard = [...board];
-    const { die, active: oldActive } = newBoard[index];
+    const { letters, activeLetter: oldActive } = newBoard[index];
     // there's only one value, don't get stuck in a loop
-    if (new Set(die).size === 1) return;
+    if (new Set(letters).size === 1) return;
 
     let newActive = oldActive;
     while (newActive === oldActive) {
-      newActive = die[Math.floor(Math.random() * die.length)];
+      newActive = randomLetter(letters);
     }
-    newBoard[index].active = newActive;
+    newBoard[index].activeLetter = newActive;
     setBoard(newBoard);
     solveBoard(newBoard);
   };
@@ -104,15 +112,25 @@ function App() {
     }
   };
 
-  const handleEditClick = () => {
-    setDiceInput(dice.map((die) => die.join(",")));
+  const openOptions = () => {
+    const sortedDice = [];
+    board.forEach(
+      ({ letters, dieIndex }, boardIdx) =>
+        (sortedDice[boardIdx] = {
+          letters: letters.join(","),
+          newLetters: letters.join(","),
+          dieIndex,
+        })
+    );
+    setDiceInput(sortedDice);
     setGameLengthInput(gameLength); // Ensure modal shows the current game length
     setShowModal(true);
   };
 
-  const handleInputChange = (index, value) => {
+  const updateDiceInput = (index, value) => {
     const newDiceInput = [...diceInput];
-    newDiceInput[index] = value.replace(/[^A-Za-z,]/g, ""); // Remove anything that's not a letter or ,
+    const cleanedValue = value.replace(/[^a-z,]/gi, ""); // Remove anything that's not a letter or comma
+    newDiceInput[index].newLetters = cleanedValue;
     setDiceInput(newDiceInput);
   };
 
@@ -122,16 +140,36 @@ function App() {
   };
 
   const timerIsValid = (timeString) => /^\d+:\d{2}$/.test(timeString);
-  const handleUpdate = () => {
+  const saveOptions = () => {
     // Validate game length format before applying
     if (timerIsValid(gameLengthInput)) {
       setGameLength(gameLengthInput);
       setTime(secondsFromTimeString(gameLengthInput));
     }
-    const updatedDice = diceInput.map((dieString) => dieString.split(","));
-    if (JSON.stringify(updatedDice) !== JSON.stringify(dice)) {
+
+    let updateMade = false;
+    const updatedDice = [...dice];
+    const updatedBoard = [...board];
+    diceInput.forEach((die, boardIdx) => {
+      if (die.newLetters !== die.letters) {
+        const newLetters = die.newLetters.split(",");
+        updatedDice[die.dieIndex] = newLetters;
+
+        updatedBoard[boardIdx].letters = newLetters;
+        updatedBoard[boardIdx].activeLetter = randomLetter(newLetters);
+        updateMade = true;
+      }
+    });
+
+    if (updateMade) {
       setDice(updatedDice);
+      setBoard(updatedBoard);
+      solveBoard(updatedBoard);
     }
+    setShowModal(false);
+  };
+
+  const cancelOptions = () => {
     setShowModal(false);
   };
 
@@ -183,10 +221,6 @@ function App() {
     setIsTimerRunning(false);
   };
 
-  const handleCancel = () => {
-    setShowModal(false);
-  };
-
   const solveBoard = async (board) => {
     if (!wordsArray) {
       const response = await fetch(`${process.env.PUBLIC_URL}/long_words.csv`);
@@ -211,7 +245,7 @@ function App() {
 
       visited[row][col] = true;
       path.push([row, col]);
-      word += board[row * 5 + col].active.toLowerCase();
+      word += board[row * 5 + col].activeLetter.toLowerCase();
 
       if (node.search(word)) {
         const existingWord = foundWords.find((w) => w.word === word);
@@ -251,8 +285,8 @@ function App() {
 
     setWordsFound(
       foundWords.sort(
-        (a, b) => b.word.length - a.word.length || a.word.localeCompare(b.word),
-      ),
+        (a, b) => b.word.length - a.word.length || a.word.localeCompare(b.word)
+      )
     );
   };
 
@@ -357,7 +391,7 @@ function App() {
                 onDoubleClick={() => shuffleDie(index)}
                 onClick={() => handleDieClick(index)}
               >
-                {!hideLetters && cell.active}
+                {!hideLetters && cell.activeLetter}
               </div>
             ))}
           </div>
@@ -372,7 +406,7 @@ function App() {
         {!isTimerRunning && (
           <>
             <button onClick={generateBoard}>Shuffle</button>
-            <button onClick={handleEditClick}>Edit</button>
+            <button onClick={openOptions}>Edit</button>
             <button onClick={toggleHideLetters}>
               {hideLetters ? "Show" : "Hide"}
             </button>
@@ -440,7 +474,7 @@ function App() {
                           const length = word.length;
                           acc[length] = (acc[length] || 0) + 1;
                           return acc;
-                        }, {}),
+                        }, {})
                       )
                         .sort((a, b) => b[0] - a[0])
                         .map(([length, count]) => (
@@ -470,16 +504,16 @@ function App() {
               <br />
               <br />
               <div className="textarea-grid">
-                {diceInput.map((die, index) => (
+                {diceInput.map(({ letters, newLetters }, index) => (
                   <textarea
                     key={index}
-                    value={die}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    value={newLetters}
+                    onChange={(e) => updateDiceInput(index, e.target.value)}
                   />
                 ))}
               </div>
-              <button onClick={handleUpdate}>Update</button>
-              <button onClick={handleCancel}>Cancel</button>
+              <button onClick={saveOptions}>Update</button>
+              <button onClick={cancelOptions}>Cancel</button>
             </div>
           </div>
         )}
