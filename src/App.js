@@ -9,8 +9,9 @@ const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
 
 const timeStringFromSeconds = (timeInSeconds) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = Math.round(timeInSeconds % 60);
+  const roundedTime = Math.round(timeInSeconds);
+  const minutes = Math.floor(roundedTime / 60);
+  const seconds = roundedTime % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
     2,
     "0"
@@ -407,14 +408,13 @@ function App() {
               {showWords && (
                 <div className="word-list">
                   {wordsFound.map(({ path, word, count }, index) => (
-                    <>
+                    <span key={index}>
                       {/* new line when we get to the next group of words by length */}
                       {!!index &&
                       word.length < wordsFound[index - 1].word.length ? (
                         <br />
                       ) : null}
                       <p
-                        key={index}
                         onMouseEnter={() => drawWordPath(path)}
                         onMouseLeave={() => clearCanvas()}
                       >
@@ -426,7 +426,7 @@ function App() {
                           <i style={{ position: "absolute" }}>&nbsp;</i>
                         )}
                       </p>
-                    </>
+                    </span>
                   ))}
                 </div>
               )}

@@ -15,10 +15,31 @@ body,
     background: #2b3c51;
   }
   
-  .wrapper {
+.wrapper {
   text-align: center;
   font-family: Arial, sans-serif;
   max-width: 600px;
+  transition: all 0.5s;
+  }
+  
+  .App.playing .wrapper {
+    max-width: 100%;
+  }
+  
+  @media screen and (max-width: 899px) {
+    .wrapper {
+      max-width: 100%;
+    }
+  }
+  
+  @media screen and (min-width: 900px) {
+  
+    .solutions {
+      position: absolute;
+      text-align: start;
+      left: 600px;
+      top: 80px;
+    }
 }
 
 .board-container {
@@ -46,7 +67,7 @@ body,
   height: 100px;
     width: 100px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
   user-select: none;
   }
   
@@ -90,21 +111,6 @@ button {
 }
 canvas {
   z-index: -1;
-}
-
-@media screen and (max-width: 899px) {
-  .wrapper {
-    margin: auto;
-  }
-}
-@media screen and (min-width: 900px) {
-  
-  .solutions {
-    position: absolute;
-    text-align: start;
-    left: 600px;
-      top: 80px;
-  }
 }
 
 .solutions .toggles {
@@ -176,16 +182,16 @@ button {
   margin: 5px;
   background: #efeffa;
     border-width: 1px
-  }
-  
-  button:hover {
+}
+
+button:hover {
     background: #ddddf5;
 }
-  
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                input[type="text"] {
-    width: 60px;
-    text-align: center;
+input[type="text"] {
+  width: 60px;
+  text-align: center;
 }
+
 input.invalid {
   color: red;
 }
