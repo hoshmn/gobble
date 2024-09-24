@@ -70,7 +70,7 @@ function App() {
     const newBoard = shuffledDice.map(({ letters, dieIndex }) => ({
       activeLetter: randomLetter(letters),
       letters,
-      dieIndex,
+      dieIndex
     }));
     setBoard(newBoard);
     solveBoard(newBoard);
@@ -119,7 +119,7 @@ function App() {
         (sortedDice[boardIdx] = {
           letters: letters.join(","),
           newLetters: letters.join(","),
-          dieIndex,
+          dieIndex
         })
     );
     setDiceInput(sortedDice);
@@ -266,7 +266,7 @@ function App() {
         [1, -1],
         [1, 1],
         [-1, -1],
-        [-1, 1],
+        [-1, 1]
       ];
 
       for (let [dx, dy] of directions) {
@@ -364,7 +364,7 @@ function App() {
     const opacity = maxUsage ? usage / maxUsage : 0;
 
     return {
-      backgroundColor: !!opacity ? `rgba(255, 214, 24, ${opacity})` : "#f0f0f0",
+      backgroundColor: !!opacity ? `rgba(255, 214, 24, ${opacity})` : "#f0f0f0"
     };
   };
 
@@ -399,7 +399,7 @@ function App() {
             id="hoverCanvas"
             style={{
               position: "absolute",
-              pointerEvents: "none",
+              pointerEvents: "none"
             }}
           />
         </div>

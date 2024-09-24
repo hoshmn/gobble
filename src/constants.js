@@ -23,5 +23,5 @@ export const DICE = [
   ["C", "C", "E", "N", "S", "T"],
   ["D", "H", "H", "N", "O", "W"],
   ["D", "H", "H", "L", "O", "R"],
-  ["An", "Er", "He", "In", "Qu", "Th"],
+  ["An", "Er", "He", "In", "Qu", "Th"]
 ];
