@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/gobble/static/css/main.501ce156.css",
-    "main.js": "/gobble/static/js/main.9ae9dc44.js",
+    "main.js": "/gobble/static/js/main.b6335c7f.js",
     "static/js/453.8d024661.chunk.js": "/gobble/static/js/453.8d024661.chunk.js",
     "index.html": "/gobble/index.html",
     "main.501ce156.css.map": "/gobble/static/css/main.501ce156.css.map",
-    "main.9ae9dc44.js.map": "/gobble/static/js/main.9ae9dc44.js.map",
+    "main.b6335c7f.js.map": "/gobble/static/js/main.b6335c7f.js.map",
     "453.8d024661.chunk.js.map": "/gobble/static/js/453.8d024661.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.501ce156.css",
-    "static/js/main.9ae9dc44.js"
+    "static/js/main.b6335c7f.js"
   ]
 }
