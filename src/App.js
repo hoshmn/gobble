@@ -3,6 +3,7 @@ import "./App.css";
 import { DICE } from "./constants";
 import { Trie } from "./Trie";
 
+let wordsArray = null;
 const defaultGameSeconds = 244; // 4 minutes and 4 seconds
 const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
@@ -171,9 +172,12 @@ function App() {
   };
 
   const solveBoard = async (board) => {
-    const response = await fetch("/long_words.csv");
-    const text = await response.text();
-    const wordsArray = text.split("\n").map((word) => word.trim()); // Split CSV by newlines and trim whitespace
+    if (!wordsArray) {
+      const response = await fetch(`${process.env.PUBLIC_URL}/long_words.csv`);
+      const text = await response.text();
+      // Split CSV by newlines and trim whitespace
+      wordsArray = text.split("\n").map((word) => word.trim());
+    }
 
     const trie = new Trie();
     wordsArray.forEach((word) => trie.insert(word));
@@ -198,14 +202,16 @@ function App() {
       }
 
       const directions = [
+        // Horizontal and vertical
         [0, 1],
         [1, 0],
         [0, -1],
-        [-1, 0], // Horizontal and vertical
+        [-1, 0],
+        // Diagonal
+        [1, -1],
         [1, 1],
         [-1, -1],
         [-1, 1],
-        [1, -1], // Diagonal
       ];
 
       for (let [dx, dy] of directions) {
