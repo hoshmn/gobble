@@ -8,21 +8,6 @@ const defaultGameSeconds = 244; // 4 minutes and 4 seconds
 const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
 
-function aggregateFoundWords(words) {
-  const uniqueWords = [];
-
-  words.forEach((word) => {
-    const existingEntry = uniqueWords.find((w) => w.word === word.word);
-    if (existingEntry) {
-      existingEntry.count++;
-    } else {
-      uniqueWords.push({ ...word, count: 1 });
-    }
-  });
-
-  return uniqueWords;
-}
-
 const formatTime = (timeInSeconds) => {
   const minutes = Math.floor(timeInSeconds / 60);
   const seconds = timeInSeconds % 60;
@@ -198,7 +183,12 @@ function App() {
       word += board[row * 5 + col].active.toLowerCase();
 
       if (node.search(word)) {
-        foundWords.push({ word, path: [...path] });
+        const existingWord = foundWords.find((w) => w.word === word);
+        if (existingWord) {
+          existingWord.count++;
+        } else {
+          foundWords.push({ word, path: [...path], count: 1 });
+        }
       }
 
       const directions = [
@@ -229,11 +219,8 @@ function App() {
     }
 
     setWordsFound(
-      aggregateFoundWords(
-        foundWords.sort(
-          (a, b) =>
-            b.word.length - a.word.length || a.word.localeCompare(b.word)
-        )
+      foundWords.sort(
+        (a, b) => b.word.length - a.word.length || a.word.localeCompare(b.word)
       )
     );
   };
