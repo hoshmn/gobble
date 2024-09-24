@@ -306,11 +306,6 @@ function App() {
     canvas.width = boardRect.width;
     canvas.height = boardRect.height;
 
-    // canvas.style.top = `${boardRect.top}px`;
-    canvas.style.top = 0;
-    // canvas.style.left = `${boardRect.left}px`;
-    canvas.style.left = "20px";
-
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
     ctx.strokeStyle = "#ffd618";
     ctx.lineWidth = 8;
@@ -378,7 +373,6 @@ function App() {
           </button>
           <button onClick={resetTimer}>Reset</button>
         </div>
-        {/* Board and Canvas */}
         <div className="board-container">
           <div
             className={`board ${!!hoveredWordPath ? "solution-hovered" : ""}`}
@@ -394,14 +388,8 @@ function App() {
                 {!hideLetters && cell.activeLetter}
               </div>
             ))}
+            <canvas id="hoverCanvas" />
           </div>
-          <canvas
-            id="hoverCanvas"
-            style={{
-              position: "absolute",
-              pointerEvents: "none"
-            }}
-          />
         </div>
         {!isTimerRunning && (
           <>

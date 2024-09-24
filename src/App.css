@@ -46,6 +46,7 @@ body,
   position: relative;
 }
 .board {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-gap: 10px;
@@ -124,6 +125,9 @@ button {
   cursor: pointer;
 }
 canvas {
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
   z-index: -1;
 }
 
