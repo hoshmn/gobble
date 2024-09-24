@@ -14,7 +14,7 @@ const timeStringFromSeconds = (timeInSeconds) => {
   const seconds = roundedTime % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
     2,
-    "0"
+    "0",
   )}`;
 };
 
@@ -36,10 +36,10 @@ function App() {
   const [time, setTime] = useState(defaultGameSeconds);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [gameLength, setGameLength] = useState(
-    timeStringFromSeconds(defaultGameSeconds)
+    timeStringFromSeconds(defaultGameSeconds),
   );
   const [gameLengthInput, setGameLengthInput] = useState(
-    timeStringFromSeconds(defaultGameSeconds)
+    timeStringFromSeconds(defaultGameSeconds),
   );
   const [wordsFound, setWordsFound] = useState([]);
   const [hoveredWordPath, setHoveredWordPath] = useState(null);
@@ -251,8 +251,8 @@ function App() {
 
     setWordsFound(
       foundWords.sort(
-        (a, b) => b.word.length - a.word.length || a.word.localeCompare(b.word)
-      )
+        (a, b) => b.word.length - a.word.length || a.word.localeCompare(b.word),
+      ),
     );
   };
 
@@ -440,7 +440,7 @@ function App() {
                           const length = word.length;
                           acc[length] = (acc[length] || 0) + 1;
                           return acc;
-                        }, {})
+                        }, {}),
                       )
                         .sort((a, b) => b[0] - a[0])
                         .map(([length, count]) => (

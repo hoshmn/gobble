@@ -7,39 +7,38 @@ body,
 }
 .App {
   background: #f0f0f080;
-    transition: all 0.5s;
-    height: 100vh;
-  }
-  
-  .App.playing {
-    background: #2b3c51;
-  }
-  
+  transition: all 0.5s;
+  height: 100vh;
+}
+
+.App.playing {
+  background: #2b3c51;
+}
+
 .wrapper {
   text-align: center;
   font-family: Arial, sans-serif;
   max-width: 600px;
   transition: all 0.5s;
-  }
-  
-  .App.playing .wrapper {
+}
+
+.App.playing .wrapper {
+  max-width: 100%;
+}
+
+@media screen and (max-width: 899px) {
+  .wrapper {
     max-width: 100%;
   }
-  
-  @media screen and (max-width: 899px) {
-    .wrapper {
-      max-width: 100%;
-    }
+}
+
+@media screen and (min-width: 900px) {
+  .solutions {
+    position: absolute;
+    text-align: start;
+    left: 600px;
+    top: 80px;
   }
-  
-  @media screen and (min-width: 900px) {
-  
-    .solutions {
-      position: absolute;
-      text-align: start;
-      left: 600px;
-      top: 80px;
-    }
 }
 
 .board-container {
@@ -55,27 +54,27 @@ body,
 
 .cell {
   box-sizing: border-box;
-    position: relative;
+  position: relative;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   padding: 20px;
   font-size: 60px;
-    text-transform: capitalize;
+  text-transform: capitalize;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100px;
-    width: 100px;
+  width: 100px;
   cursor: pointer;
   transition: background-color 0.2s;
   user-select: none;
-  }
-  
+}
+
 .App.playing .cell {
   background-color: #d4e9ff;
 }
 .cell.selected {
-    background-color: #b3d9ff !important;
+  background-color: #b3d9ff !important;
 }
 
 .board.solution-hovered .cell:not(.hovered) {
@@ -88,17 +87,17 @@ body,
 
 .board.solution-hovered .cell.hovered.first {
   border-width: 4px;
-    border-color: black;
-  }
-  
-  .board.solution-hovered .cell.hovered.last {
-    border-width: 6px;
+  border-color: black;
+}
+
+.board.solution-hovered .cell.hovered.last {
+  border-width: 6px;
 }
 .timer h3 {
   background: white;
-    font-family: monospace;
-    font-size: 16px;
-    padding: 10px 16px;
+  font-family: monospace;
+  font-size: 16px;
+  padding: 10px 16px;
   display: inline-block;
   margin-right: 8px;
 }
@@ -181,11 +180,11 @@ textarea {
 button {
   margin: 5px;
   background: #efeffa;
-    border-width: 1px
+  border-width: 1px;
 }
 
 button:hover {
-    background: #ddddf5;
+  background: #ddddf5;
 }
 input[type="text"] {
   width: 60px;
