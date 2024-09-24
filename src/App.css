@@ -1,4 +1,21 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 .App {
+  background: #f0f0f080;
+    transition: all 0.5s;
+    height: 100vh;
+  }
+  
+  .App.playing {
+    background: #2b3c51;
+  }
+  
+  .wrapper {
   text-align: center;
   font-family: Arial, sans-serif;
   max-width: 600px;
@@ -16,8 +33,9 @@
 }
 
 .cell {
-  background-color: #f0f0f0;
   box-sizing: border-box;
+    position: relative;
+  background-color: #f0f0f0;
   border: 1px solid #ccc;
   padding: 20px;
   font-size: 60px;
@@ -28,11 +46,14 @@
   height: 100px;
     width: 100px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s;
   user-select: none;
   }
   
-  .cell.selected {
+.App.playing .cell {
+  background-color: #d4e9ff;
+}
+.cell.selected {
     background-color: #b3d9ff !important;
 }
 
@@ -45,15 +66,20 @@
 }
 
 .board.solution-hovered .cell.hovered.first {
-  border-width: 6px;
+  border-width: 4px;
+    border-color: black;
   }
   
   .board.solution-hovered .cell.hovered.last {
-    border-color: black;
+    border-width: 6px;
 }
 .timer h3 {
+  background: white;
+    font-family: monospace;
+    font-size: 16px;
+    padding: 10px 16px;
   display: inline-block;
-  padding-right: 8px;
+  margin-right: 8px;
 }
 button {
   margin-top: 20px;
@@ -67,7 +93,7 @@ canvas {
 }
 
 @media screen and (max-width: 899px) {
-  .App {
+  .wrapper {
     margin: auto;
   }
 }

@@ -69,6 +69,7 @@ function App() {
   };
 
   const shuffleDie = (index) => {
+    if (isTimerRunning) return;
     const newBoard = [...board];
     const { die, active: oldActive } = newBoard[index];
     // there's only one value, don't get stuck in a loop
@@ -83,7 +84,8 @@ function App() {
     solveBoard(newBoard);
   };
 
-  const handleClick = (index) => {
+  const handleDieClick = (index) => {
+    if (isTimerRunning) return;
     if (selectedIndex === null) {
       setSelectedIndex(index);
     } else {
@@ -327,157 +329,161 @@ function App() {
     const opacity = maxUsage ? usage / maxUsage : 0;
 
     return {
-      backgroundColor: `rgba(255, 214, 24, ${opacity})`,
+      backgroundColor: !!opacity ? `rgba(255, 214, 24, ${opacity})` : "#f0f0f0",
     };
   };
 
   return (
-    <div className="App">
-      <div className="timer">
-        <h3>{timeStringFromSeconds(time)}</h3>
-        <button onClick={toggleTimer}>
-          {isTimerRunning ? "Pause" : "Start"}
-        </button>
-        <button onClick={resetTimer}>Reset</button>
-      </div>
-      {/* Board and Canvas */}
-      <div className="board-container">
-        <div className={`board ${!!hoveredWordPath ? "solution-hovered" : ""}`}>
-          {board.map((cell, index) => (
-            <div
-              key={index}
-              className={getCellClasses(index)}
-              style={getCellStyle(index)}
-              onDoubleClick={() => shuffleDie(index)}
-              onClick={() => handleClick(index)}
-            >
-              {!hideLetters && cell.active}
-            </div>
-          ))}
-        </div>
-        <canvas
-          id="hoverCanvas"
-          style={{
-            position: "absolute",
-            pointerEvents: "none",
-          }}
-        />
-      </div>
-      {!isTimerRunning && (
-        <>
-          <button onClick={generateBoard}>Shuffle</button>
-          <button onClick={handleEditClick}>Edit</button>
-          <button onClick={toggleHideLetters}>
-            {hideLetters ? "Show" : "Hide"}
+    <div className={`App ${isTimerRunning ? " playing" : ""}`}>
+      <div className="wrapper">
+        <div className="timer">
+          <h3>{timeStringFromSeconds(time)}</h3>
+          <button onClick={toggleTimer}>
+            {isTimerRunning ? "Pause" : "Start"}
           </button>
+          <button onClick={resetTimer}>Reset</button>
+        </div>
+        {/* Board and Canvas */}
+        <div className="board-container">
+          <div
+            className={`board ${!!hoveredWordPath ? "solution-hovered" : ""}`}
+          >
+            {board.map((cell, index) => (
+              <div
+                key={index}
+                className={getCellClasses(index)}
+                style={getCellStyle(index)}
+                onDoubleClick={() => shuffleDie(index)}
+                onClick={() => handleDieClick(index)}
+              >
+                {!hideLetters && cell.active}
+              </div>
+            ))}
+          </div>
+          <canvas
+            id="hoverCanvas"
+            style={{
+              position: "absolute",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+        {!isTimerRunning && (
+          <>
+            <button onClick={generateBoard}>Shuffle</button>
+            <button onClick={handleEditClick}>Edit</button>
+            <button onClick={toggleHideLetters}>
+              {hideLetters ? "Show" : "Hide"}
+            </button>
 
-          <div className="solutions">
-            <div className="toggles">
-              <span>Show:</span>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showHeatmap}
-                  onChange={() => setShowHeatmap(!showHeatmap)}
-                />
-                Heatmap
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showStats}
-                  onChange={() => setShowStats(!showStats)}
-                />
-                Stats
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showWords}
-                  onChange={() => setShowWords(!showWords)}
-                />
-                Words
-              </label>
+            <div className="solutions">
+              <div className="toggles">
+                <span>Show:</span>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={showHeatmap}
+                    onChange={() => setShowHeatmap(!showHeatmap)}
+                  />
+                  Heatmap
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={showStats}
+                    onChange={() => setShowStats(!showStats)}
+                  />
+                  Stats
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={showWords}
+                    onChange={() => setShowWords(!showWords)}
+                  />
+                  Words
+                </label>
+              </div>
+              {showWords && (
+                <div className="word-list">
+                  {wordsFound.map(({ path, word, count }, index) => (
+                    <>
+                      {/* new line when we get to the next group of words by length */}
+                      {!!index &&
+                      word.length < wordsFound[index - 1].word.length ? (
+                        <br />
+                      ) : null}
+                      <p
+                        key={index}
+                        onMouseEnter={() => drawWordPath(path)}
+                        onMouseLeave={() => clearCanvas()}
+                      >
+                        {word}{" "}
+                        {count > 1 ? (
+                          <i>({count})</i>
+                        ) : (
+                          // hack to allow selection of individual words (otherwise multiple selected)
+                          <i style={{ position: "absolute" }}>&nbsp;</i>
+                        )}
+                      </p>
+                    </>
+                  ))}
+                </div>
+              )}
+              {showStats && (
+                <div className="stats">
+                  <br />
+                  {!wordsFound.length
+                    ? "None"
+                    : Object.entries(
+                        wordsFound.reduce((acc, { word }) => {
+                          const length = word.length;
+                          acc[length] = (acc[length] || 0) + 1;
+                          return acc;
+                        }, {})
+                      )
+                        .sort((a, b) => b[0] - a[0])
+                        .map(([length, count]) => (
+                          <div key={length}>
+                            {length} letters: <b>{count}</b>
+                          </div>
+                        ))}
+                </div>
+              )}
             </div>
-            {showWords && (
-              <div className="word-list">
-                {wordsFound.map(({ path, word, count }, index) => (
-                  <>
-                    {/* new line when we get to the next group of words by length */}
-                    {!!index &&
-                    word.length < wordsFound[index - 1].word.length ? (
-                      <br />
-                    ) : null}
-                    <p
-                      key={index}
-                      onMouseEnter={() => drawWordPath(path)}
-                      onMouseLeave={() => clearCanvas()}
-                    >
-                      {word}{" "}
-                      {count > 1 ? (
-                        <i>({count})</i>
-                      ) : (
-                        // hack to allow selection of individual words (otherwise multiple selected)
-                        <i style={{ position: "absolute" }}>&nbsp;</i>
-                      )}
-                    </p>
-                  </>
+          </>
+        )}
+        {showModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Edit</h2>
+              <label>
+                Game Length (mm:ss):{" "}
+                <input
+                  type="text"
+                  value={gameLengthInput}
+                  className={timerIsValid(gameLengthInput) ? "" : "invalid"}
+                  onChange={handleGameLengthInputChange}
+                  maxLength={5}
+                />
+              </label>
+              <br />
+              <br />
+              <div className="textarea-grid">
+                {diceInput.map((die, index) => (
+                  <textarea
+                    key={index}
+                    value={die}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                  />
                 ))}
               </div>
-            )}
-            {showStats && (
-              <div className="stats">
-                <br />
-                {!wordsFound.length
-                  ? "None"
-                  : Object.entries(
-                      wordsFound.reduce((acc, { word }) => {
-                        const length = word.length;
-                        acc[length] = (acc[length] || 0) + 1;
-                        return acc;
-                      }, {})
-                    )
-                      .sort((a, b) => b[0] - a[0])
-                      .map(([length, count]) => (
-                        <div key={length}>
-                          {length} letters: <b>{count}</b>
-                        </div>
-                      ))}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Edit</h2>
-            <label>
-              Game Length (mm:ss):{" "}
-              <input
-                type="text"
-                value={gameLengthInput}
-                className={timerIsValid(gameLengthInput) ? "" : "invalid"}
-                onChange={handleGameLengthInputChange}
-                maxLength={5}
-              />
-            </label>
-            <br />
-            <br />
-            <div className="textarea-grid">
-              {diceInput.map((die, index) => (
-                <textarea
-                  key={index}
-                  value={die}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                />
-              ))}
+              <button onClick={handleUpdate}>Update</button>
+              <button onClick={handleCancel}>Cancel</button>
             </div>
-            <button onClick={handleUpdate}>Update</button>
-            <button onClick={handleCancel}>Cancel</button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
