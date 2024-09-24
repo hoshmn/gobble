@@ -66,7 +66,7 @@ canvas {
   z-index: -1;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 899px) {
   .App {
     margin: auto;
   }
@@ -91,7 +91,7 @@ canvas {
   margin-left: 16px;
   margin-right: 4px;
 }
-.word-list span {
+.word-list p {
   font-family: monospace;
   padding: 8px;
   margin: 8px 8px 0 0;
@@ -101,10 +101,13 @@ canvas {
   border: 1px solid #ffd618;
 }
 
-.word-list span:hover {
+.word-list p:hover {
   background: #f0f0f0;
 }
 
+.stats {
+  font-family: monospace;
+}
 /* Modal styling */
 .modal {
   position: fixed;

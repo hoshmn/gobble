@@ -374,13 +374,25 @@ function App() {
         {showWords && (
           <div className="word-list">
             {wordsFound.map(({ path, word, count }, index) => (
-              <span
-                key={index}
-                onMouseEnter={() => drawWordPath(path)}
-                onMouseLeave={() => clearCanvas()}
-              >
-                {word} {count > 1 && <i>({count})</i>}
-              </span>
+              <>
+                {/* new line when we get to the next group of words by length */}
+                {!!index && word.length < wordsFound[index - 1].word.length ? (
+                  <br />
+                ) : null}
+                <p
+                  key={index}
+                  onMouseEnter={() => drawWordPath(path)}
+                  onMouseLeave={() => clearCanvas()}
+                >
+                  {word}{" "}
+                  {count > 1 ? (
+                    <i>({count})</i>
+                  ) : (
+                    // hack to allow selection of individual words (otherwise multiple selected)
+                    <i style={{ position: "absolute" }}>&nbsp;</i>
+                  )}
+                </p>
+              </>
             ))}
           </div>
         )}
