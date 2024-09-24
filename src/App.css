@@ -71,7 +71,7 @@ body,
   user-select: none;
 }
 @media screen and (max-width: 599px) {
-  .playing .cell {
+  .cell {
     height: 60px;
     width: 60px;
     font-size: 48px;
@@ -190,7 +190,7 @@ canvas {
 }
 
 textarea {
-  width: 100px;
+  max-width: 100px;
   height: 40px;
   resize: none;
   overflow: auto;

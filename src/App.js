@@ -102,13 +102,14 @@ function App() {
         setSelectedIndex(null);
         return;
       }
+      setSelectedIndex(index);
       const newBoard = [...board];
       const temp = newBoard[selectedIndex];
       newBoard[selectedIndex] = newBoard[index];
       newBoard[index] = temp;
       setBoard(newBoard);
       solveBoard(newBoard);
-      setSelectedIndex(null);
+      setTimeout(() => setSelectedIndex(null), 200);
     }
   };
 
