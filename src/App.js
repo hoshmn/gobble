@@ -8,13 +8,18 @@ const defaultGameSeconds = 244; // 4 minutes and 4 seconds
 const rowLength = 5;
 const coordToIndex = ([row, col]) => row * rowLength + col;
 
-const formatTime = (timeInSeconds) => {
+const timeStringFromSeconds = (timeInSeconds) => {
   const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = timeInSeconds % 60;
+  const seconds = Math.round(timeInSeconds % 60);
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
     2,
     "0"
   )}`;
+};
+
+const secondsFromTimeString = (timeString) => {
+  const [minutes, seconds] = timeString.split(":").map(Number);
+  return minutes * 60 + seconds;
 };
 
 function App() {
@@ -29,9 +34,11 @@ function App() {
   const [hideLetters, setHideLetters] = useState(false);
   const [time, setTime] = useState(defaultGameSeconds);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [gameLength, setGameLength] = useState(formatTime(defaultGameSeconds));
+  const [gameLength, setGameLength] = useState(
+    timeStringFromSeconds(defaultGameSeconds)
+  );
   const [gameLengthInput, setGameLengthInput] = useState(
-    formatTime(defaultGameSeconds)
+    timeStringFromSeconds(defaultGameSeconds)
   );
   const [wordsFound, setWordsFound] = useState([]);
   const [hoveredWordPath, setHoveredWordPath] = useState(null);
@@ -45,6 +52,7 @@ function App() {
   useEffect(() => {
     if (time <= 0 && isTimerRunning) {
       setHideLetters(true); // Auto-hide letters when time is up
+      setTime(0);
       stopTimer();
     }
   }, [time, isTimerRunning]);
@@ -115,8 +123,7 @@ function App() {
     // Validate game length format before applying
     if (timerIsValid(gameLengthInput)) {
       setGameLength(gameLengthInput);
-      const [minutes, seconds] = gameLengthInput.split(":").map(Number);
-      setTime(minutes * 60 + seconds); // Update the timer's total time
+      setTime(secondsFromTimeString(gameLengthInput));
     }
     const updatedDice = diceInput.map((dieString) => dieString.split(","));
     if (JSON.stringify(updatedDice) !== JSON.stringify(dice)) {
@@ -131,20 +138,41 @@ function App() {
 
   const toggleTimer = () => {
     if (isTimerRunning) {
-      clearInterval(timerRef.current);
+      clearTimeout(timerRef.current);
     } else {
-      timerRef.current = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
-      }, 1000);
+      if (time <= 0) {
+        setTime(secondsFromTimeString(gameLength));
+      }
+      const interval = 1000; // ms
+      let startTime = Date.now(); // Time when the timer started
+      let expectedTime = startTime + interval; // Expected time for the next step
+
+      const step = () => {
+        const now = Date.now();
+        // Time since the last cycle
+        const actualElapsed = now - startTime;
+        startTime = now;
+
+        // Decrement by actual elapsed seconds
+        setTime((prevTime) => prevTime - actualElapsed / 1000);
+
+        expectedTime += interval;
+        const timeUntilNextStep = expectedTime - Date.now();
+
+        timerRef.current = setTimeout(step, Math.max(0, timeUntilNextStep));
+      };
+
+      // Start the timer
+      timerRef.current = setTimeout(step, interval);
     }
-    setIsTimerRunning(!isTimerRunning);
+    setIsTimerRunning(!isTimerRunning); // Toggle timer state
   };
 
   const resetTimer = () => {
-    const [minutes, seconds] = gameLength.split(":").map(Number);
-    setTime(minutes * 60 + seconds); // Reset to the current game length
+    // Reset to the current game length
+    setTime(secondsFromTimeString(gameLength));
     setIsTimerRunning(false);
-    clearInterval(timerRef.current);
+    clearTimeout(timerRef.current);
   };
 
   const stopTimer = () => {
@@ -306,13 +334,12 @@ function App() {
   return (
     <div className="App">
       <div className="timer">
-        <h3>{formatTime(time)}</h3>
+        <h3>{timeStringFromSeconds(time)}</h3>
         <button onClick={toggleTimer}>
           {isTimerRunning ? "Pause" : "Start"}
         </button>
         <button onClick={resetTimer}>Reset</button>
       </div>
-
       {/* Board and Canvas */}
       <div className="board-container">
         <div className={`board ${!!hoveredWordPath ? "solution-hovered" : ""}`}>
@@ -336,88 +363,91 @@ function App() {
           }}
         />
       </div>
+      {!isTimerRunning && (
+        <>
+          <button onClick={generateBoard}>Shuffle</button>
+          <button onClick={handleEditClick}>Edit</button>
+          <button onClick={toggleHideLetters}>
+            {hideLetters ? "Show" : "Hide"}
+          </button>
 
-      <button onClick={generateBoard}>Shuffle</button>
-      <button onClick={handleEditClick}>Edit</button>
-      <button onClick={toggleHideLetters}>
-        {hideLetters ? "Show" : "Hide"}
-      </button>
-
-      <div className="solutions">
-        <div className="toggles">
-          <span>Show:</span>
-          <label>
-            <input
-              type="checkbox"
-              checked={showHeatmap}
-              onChange={() => setShowHeatmap(!showHeatmap)}
-            />
-            Heatmap
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={showStats}
-              onChange={() => setShowStats(!showStats)}
-            />
-            Stats
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={showWords}
-              onChange={() => setShowWords(!showWords)}
-            />
-            Words
-          </label>
-        </div>
-        {showWords && (
-          <div className="word-list">
-            {wordsFound.map(({ path, word, count }, index) => (
-              <>
-                {/* new line when we get to the next group of words by length */}
-                {!!index && word.length < wordsFound[index - 1].word.length ? (
-                  <br />
-                ) : null}
-                <p
-                  key={index}
-                  onMouseEnter={() => drawWordPath(path)}
-                  onMouseLeave={() => clearCanvas()}
-                >
-                  {word}{" "}
-                  {count > 1 ? (
-                    <i>({count})</i>
-                  ) : (
-                    // hack to allow selection of individual words (otherwise multiple selected)
-                    <i style={{ position: "absolute" }}>&nbsp;</i>
-                  )}
-                </p>
-              </>
-            ))}
+          <div className="solutions">
+            <div className="toggles">
+              <span>Show:</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showHeatmap}
+                  onChange={() => setShowHeatmap(!showHeatmap)}
+                />
+                Heatmap
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showStats}
+                  onChange={() => setShowStats(!showStats)}
+                />
+                Stats
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showWords}
+                  onChange={() => setShowWords(!showWords)}
+                />
+                Words
+              </label>
+            </div>
+            {showWords && (
+              <div className="word-list">
+                {wordsFound.map(({ path, word, count }, index) => (
+                  <>
+                    {/* new line when we get to the next group of words by length */}
+                    {!!index &&
+                    word.length < wordsFound[index - 1].word.length ? (
+                      <br />
+                    ) : null}
+                    <p
+                      key={index}
+                      onMouseEnter={() => drawWordPath(path)}
+                      onMouseLeave={() => clearCanvas()}
+                    >
+                      {word}{" "}
+                      {count > 1 ? (
+                        <i>({count})</i>
+                      ) : (
+                        // hack to allow selection of individual words (otherwise multiple selected)
+                        <i style={{ position: "absolute" }}>&nbsp;</i>
+                      )}
+                    </p>
+                  </>
+                ))}
+              </div>
+            )}
+            {showStats && (
+              <div className="stats">
+                <br />
+                {!wordsFound.length
+                  ? "None"
+                  : Object.entries(
+                      wordsFound.reduce((acc, { word }) => {
+                        const length = word.length;
+                        acc[length] = (acc[length] || 0) + 1;
+                        return acc;
+                      }, {})
+                    )
+                      .sort((a, b) => b[0] - a[0])
+                      .map(([length, count]) => (
+                        <div key={length}>
+                          {length} letters: <b>{count}</b>
+                        </div>
+                      ))}
+              </div>
+            )}
           </div>
-        )}
-        {showStats && (
-          <div className="stats">
-            <br />
-            {!wordsFound.length
-              ? "None"
-              : Object.entries(
-                  wordsFound.reduce((acc, { word }) => {
-                    const length = word.length;
-                    acc[length] = (acc[length] || 0) + 1;
-                    return acc;
-                  }, {})
-                )
-                  .sort((a, b) => b[0] - a[0])
-                  .map(([length, count]) => (
-                    <div key={length}>
-                      {length} letters: <b>{count}</b>
-                    </div>
-                  ))}
-          </div>
-        )}
-      </div>
-
+        </>
+      )}
       {showModal && (
         <div className="modal">
           <div className="modal-content">
