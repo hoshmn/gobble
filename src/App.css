@@ -67,7 +67,7 @@ body,
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.5s;
   user-select: none;
 }
 @media screen and (max-width: 599px) {
